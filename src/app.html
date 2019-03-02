@@ -1,3 +1,92 @@
 <main>
-  cool!
+  <header>
+    {state.instructionText}
+  </header>
+  <Lane moving="{state.laneMoving}" />
+  <div class="ball-container {state.ballAnim}">
+    <Ball state="{state}" />
+  </div>
+  <div class="state-change-container">
+    <button on:click="{prevState}">prev</button>
+    <button on:click="{nextState}">next</button>
+  </div>
 </main>
+
+<style>
+  main {
+    display: flex;
+    justify-content: center;
+  }
+  .ball-container {
+    --ball-size: 10rem;
+    position: fixed;
+    bottom: 5rem;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+  .ball-container.strafing {
+    display: initial;
+    animation: strafe 2s linear infinite;
+  }
+
+  /*To remove*/
+  .state-change-container {
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+  }
+
+  @keyframes strafe {
+    0% {
+      padding-left: calc(50% - var(--ball-size) / 2);
+    }
+    25% {
+      padding-left: calc(90% - var(--ball-size));
+    }
+    75% {
+      padding-left: 10%;
+    }
+    100% {
+      padding-left: calc(50% - var(--ball-size) / 2);
+    }
+  }
+</style>
+
+<script>
+  import Lane from './components/Lane.html'
+  import Ball from './components/Ball.html'
+
+  let moving = true
+  
+  const states = [
+    {
+      name: 'reset'
+    },
+    {
+      name: 'strafe',
+      ballAnim: 'strafing',
+      instructionText: 'Bump to stop!'
+    },
+    {
+      name: 'tilt',
+      instructionText: 'Lock in the angle!'
+    }
+  ]
+  let stateIndex = 1
+  let state = states[stateIndex]
+
+  const nextState = () => {
+    stateIndex = (stateIndex + 1) % states.length
+    state = states[stateIndex]
+    if (state.callback)
+      state.callback()
+  }
+  const prevState = () => {
+    stateIndex = (stateIndex - 1)
+    if (stateIndex < 0)
+      stateIndex = states.length - 1
+    state = states[stateIndex]
+  }
+
+</script>

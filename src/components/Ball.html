@@ -1,0 +1,105 @@
+<div class="ball {state.ballAnim || ''}">
+  <div class="hole-container">
+    <div></div>
+    <div></div>
+    <div></div>
+  </div>
+</div>
+
+<style>
+  .ball {
+    position: relative;
+    background: radial-gradient(circle at top center, #5c5c5c, #383838 60%);
+    background-size: 100% 120%;
+    border-radius: var(--ball-size);
+    height: var(--ball-size);
+    width: var(--ball-size);
+    box-shadow: -5px 15px 30px hsla(0, 0%, 30%, 0.7);
+    overflow: hidden;
+    transition: transform 0.2s;
+  }
+
+  .ball.rolling {
+    animation: color-shift 0.5s ease-in-out infinite;
+  }
+  .ball.rolling .hole-container {
+    animation: roll 0.5s ease-in-out infinite;
+  }
+
+  .ball.strafing {
+    transform: scale(1.2);
+  }
+  .ball.strafing .hole-container {
+    top: calc(var(--ball-size) / 2 - var(--hole-size));
+    animation: strafe 2s linear infinite;
+  }
+
+  .hole-container {
+    --hole-size: 3rem;
+    position: absolute;
+    left: calc(50% - var(--hole-size) / 2);
+    width: var(--hole-size);
+    height: var(--hole-size);
+
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap-reverse;
+  }
+  .hole-container div {
+    --size: 0.8rem;
+    height: var(--size);
+    width: var(--size);
+    border-radius: var(--size);
+    background: #222;
+    margin: 0.3rem;
+  }
+
+  @keyframes roll {
+    0% {
+      top: var(--ball-size);
+      transform: scaleY(0.5);
+    }
+    50% {
+      transform: scaleY(1);
+    }
+    100% {
+      top: calc(-1 * var(--hole-size));
+      transform: scaleY(0.5);
+    }
+  }
+
+  @keyframes strafe {
+    0% {
+      transform: scaleY(1);
+    }
+    25% {
+      left: var(--ball-size);
+      transform: scaleX(0.3);
+    }
+    50% {
+      transform: scaleY(1);
+    }
+    75% {
+      left: calc(-1 * var(--hole-size));
+      transform: scaleX(0.3);
+    }
+    100% {
+      transform: scaleY(1);
+    }
+  }
+
+  @keyframes color-shift {
+    0% {
+      background-position-y: -2rem;
+    }
+    50% {
+      background-position-y: 0;
+    }
+    100% {
+      background-position-y: -2rem;
+    }
+  }
+</style>
+<script>
+  export let state = {}
+</script>
