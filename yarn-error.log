@@ -1,0 +1,36 @@
+Arguments: 
+  /usr/local/Cellar/node/11.8.0/bin/node /usr/local/Cellar/yarn/1.13.0/libexec/bin/yarn.js init
+
+PATH: 
+  /Users/benholmes/bin:/usr/local/bin:/Users/benholmes/.composer/vendor/bin:/Users/benholmes/flutter/bin:/Users/benholmes/.nvm/versions/node/v8.0.0/bin:/Library/Frameworks/Python.framework/Versions/3.6/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Users/benholmes/Library/Android/sdk/platform-tools:/Users/benholmes/Library/Android/sdk/tools:/Applications/VMware Fusion.app/Contents/Public:/Library/TeX/texbin:/opt/X11/bin
+
+Yarn version: 
+  1.13.0
+
+Node version: 
+  11.8.0
+
+Platform: 
+  darwin x64
+
+Trace: 
+  Error: canceled
+      at Interface.<anonymous> (/usr/local/Cellar/yarn/1.13.0/libexec/lib/cli.js:125657:13)
+      at Interface.emit (events.js:197:13)
+      at Interface._ttyWrite (readline.js:799:16)
+      at ReadStream.onkeypress (readline.js:184:10)
+      at ReadStream.emit (events.js:197:13)
+      at emitKeys (internal/readline.js:424:14)
+      at emitKeys.next (<anonymous>)
+      at ReadStream.onData (readline.js:1071:36)
+      at ReadStream.emit (events.js:197:13)
+      at addChunk (_stream_readable.js:288:12)
+
+npm manifest: 
+  No manifest
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile
