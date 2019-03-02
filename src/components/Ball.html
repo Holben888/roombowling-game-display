@@ -1,3 +1,7 @@
+<div class="container">
+  {#if state.name === 'tilt'}
+  <AngleArrow />
+  {/if}
 <div class="ball {state.ballAnim || ''}">
   <div class="hole-container">
     <div></div>
@@ -5,15 +9,21 @@
     <div></div>
   </div>
 </div>
+</div>
 
 <style>
+  .container {
+    position: relative;
+    height: var(--ball-size);
+    width: var(--ball-size);
+  }
   .ball {
     position: relative;
     background: radial-gradient(circle at top center, #5c5c5c, #383838 60%);
     background-size: 100% 120%;
     border-radius: var(--ball-size);
-    height: var(--ball-size);
-    width: var(--ball-size);
+    height: 100%;
+    width: 100%;
     box-shadow: -5px 15px 30px hsla(0, 0%, 30%, 0.7);
     overflow: hidden;
     transition: transform 0.2s;
@@ -101,5 +111,7 @@
   }
 </style>
 <script>
+  import AngleArrow from './Angle-arrow.html'
+
   export let state = {}
 </script>

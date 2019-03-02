@@ -1,11 +1,10 @@
-@import url('https://use.typekit.net/zah2tdf.css');
 * {
   box-sizing: border-box;
 }
 
 html {
   font-size: 16px;
-  font-family: open-sans, sans-serif;
+  font-family: avenir-black, sans-serif;
 }
 
 body {

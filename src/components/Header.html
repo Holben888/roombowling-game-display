@@ -1,4 +1,15 @@
-<header>{instructionText}</header>
+<header>{instructionText || ''}</header>
+
+<style>
+  header {
+    font-size: 5rem;
+    text-align: center;
+    width: 100%;
+    height: 0;
+    position: fixed;
+    top: 10%;
+  }
+</style>
 
 <script>
   export let instructionText = ''

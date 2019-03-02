@@ -1,9 +1,8 @@
 <main>
-  <header>
-    {state.instructionText}
-  </header>
-  <Lane moving="{state.laneMoving}" />
-  <div class="ball-container {state.ballAnim}">
+  <HeaderText instructionText="{state.instructionText}" />
+  <Lane moving="{state.laneMoving}">
+  </Lane>
+  <div id="ball-container" class="{state.ballAnim}" style="--offset: {state.ballOffset}">
     <Ball state="{state}" />
   </div>
   <div class="state-change-container">
@@ -17,17 +16,19 @@
     display: flex;
     justify-content: center;
   }
-  .ball-container {
+  #ball-container {
     --ball-size: 10rem;
     position: fixed;
     bottom: 5rem;
     width: 100%;
+    padding-left: var(--offset);
+  }
+  #ball-container.strafing {
+    animation: strafe 2s linear infinite;
+  }
+  #ball-container.resting {
     display: flex;
     justify-content: center;
-  }
-  .ball-container.strafing {
-    display: initial;
-    animation: strafe 2s linear infinite;
   }
 
   /*To remove*/
@@ -56,25 +57,33 @@
 <script>
   import Lane from './components/Lane.html'
   import Ball from './components/Ball.html'
+  import HeaderText from './components/Header.html'
 
   let moving = true
+  let state = {}
   
   const states = [
     {
-      name: 'reset'
+      name: 'reset',
+      ballAnim: 'resting',
     },
     {
       name: 'strafe',
       ballAnim: 'strafing',
-      instructionText: 'Bump to stop!'
+      instructionText: 'Bump to stop!',
     },
     {
       name: 'tilt',
-      instructionText: 'Lock in the angle!'
+      instructionText: 'Lock in the angle!',
+      callback: () => {
+        const style = window.getComputedStyle(document.getElementById('ball-container'), null)
+        const padding = style.getPropertyValue('padding-left')
+        state.ballOffset = padding
+      }
     }
   ]
-  let stateIndex = 1
-  let state = states[stateIndex]
+  let stateIndex = 0
+  state = states[stateIndex]
 
   const nextState = () => {
     stateIndex = (stateIndex + 1) % states.length
