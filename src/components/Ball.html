@@ -31,11 +31,9 @@
 
   .ball.rolling {
     animation: color-shift 0.5s ease-in-out infinite;
-    animation-delay: var(--anim-delay);
   }
   .ball.rolling .hole-container {
     animation: roll 0.5s ease-in-out infinite;
-    animation-delay: var(--anim-delay);
   }
 
   .ball.strafing {
@@ -43,7 +41,7 @@
   }
   .ball.strafing .hole-container {
     top: calc(var(--ball-size) / 2 - var(--hole-size));
-    animation: strafe 6.3s linear infinite;
+    animation: strafe 5s linear infinite;
     animation-delay: var(--anim-delay);
   }
 

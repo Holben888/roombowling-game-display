@@ -1,30 +1,38 @@
-<div class="score">
-  <div class="frame"></div>
-  <div class="frame"></div>
-  <div class="main"></div>
+<div class="score {scoreChanged ? 'expand-scoreboard' : ''}">
+  <div class="frame">{score[0] || '-'}</div>
+  <div class="frame">
+    {(score[1] - score[0] > 0 ? score[1] - score[0] : 0) || '-'}
+  </div>
+  <div class="main">{score[1] || '-'}</div>
 </div>
-<video id="score-video" style="display: {playVideo ? 'initial' : 'none'}">
-  {#if playVideo}
-  <source src="/pin-videos/{score}.mp4" />
-  {/if}
-</video>
+<video
+  id="score-video"
+  style="display: {playVideo ? 'initial' : 'none'}"
+  src="/pin-videos/{Math.abs(scoreDifference)}.mp4"
+></video>
 
 <style>
   .score {
     position: fixed;
-    background: #efefef;
+    background: white;
+    box-shadow: 1px 1px 5px #333;
     top: 2rem;
     width: 5rem;
     height: 5rem;
     display: grid;
     grid-template-rows: 1fr 2fr;
     grid-template-columns: 1fr 1fr;
+    transition: transform 0.5s;
   }
   .score * {
     border: 1px solid #333;
+    padding: 0.2rem;
   }
   .score .main {
     grid-column: span 2;
+  }
+  .score.expand-scoreboard {
+    transform: scale(2) translateY(3rem);
   }
   video {
     position: fixed;
@@ -34,17 +42,24 @@
 </style>
 
 <script>
-  import { afterUpdate } from 'svelte'
+  import { beforeUpdate, afterUpdate } from 'svelte'
 
   export let score = 0
-  export let frame = 1
+  export let scoreIndex = 0
   export let playVideo = false
-  export let nextStateCallback = null
+  export let scoreChanged = false
+
+  let scoreDifference = 0
 
   afterUpdate(() => {
+    if (scoreIndex === 1) {
+      scoreDifference = score[1] - score[0]
+    } else {
+      scoreDifference = score[0]
+    }
+    console.log(scoreIndex, scoreDifference)
     if (playVideo) {
       const scoreVideo = document.getElementById('score-video')
-      scoreVideo.addEventListener('ended', nextStateCallback, false)
       scoreVideo.play()
     }
   })

@@ -4,18 +4,19 @@
   <div id="ball-container" class="{state.ballAnim}" style="--offset: {ballOffset}">
     <Ball state="{state}" />
   </div>
-  <div class="state-change-container">
+  <!-- <div class="state-change-container">
     <button on:click="{prevState}">prev</button>
-    <button on:click="{nextState}">next</button>
-  </div>
-  <ScoreBoard score="{score}" playVideo="{state.playVideo}" frame="{frame}" nextStateCallback="{nextState}" />
+    <button on:click="{() => {nextState}">next</button>
+  </div> -->
+  <ScoreBoard score="{score}" playVideo="{state.playVideo}" scoreIndex="{scoreIndex}" scoreChanged="{state.scoreChanged}" />
 </main>
 
 <style>
   main {
     display: flex;
     justify-content: center;
-    --anim-delay: 1.810s;
+    background: linear-gradient(#999, #eee);
+    --anim-delay: 0.810s;
   }
   #ball-container {
     --ball-size: 10rem;
@@ -25,7 +26,7 @@
     padding-left: var(--offset);
   }
   #ball-container.strafing {
-    animation: strafe 6.3s linear infinite;
+    animation: strafe 5s linear infinite;
     animation-delay: var(--anim-delay);
     padding-left: calc(50% - var(--ball-size) / 2);
   }
@@ -50,10 +51,10 @@
       padding-left: calc(50% - var(--ball-size) / 2);
     }
     25% {
-      padding-left: calc(90% - var(--ball-size));
+      padding-left: 10%;
     }
     75% {
-      padding-left: 10%;
+      padding-left: calc(90% - var(--ball-size));
     }
     100% {
       padding-left: calc(50% - var(--ball-size) / 2);
@@ -77,15 +78,27 @@
   let moving = true
   let state = {}
   let ballOffset = ''
-  let score = 0
-  let frame = 1
+  let score = [0, 0]
+  let scoreIndex = 0
   
   const states = [
     {
       name: 'reset',
       ballAnim: 'resting',
       instructionText: 'Kick to start!',
-      callback: () => ballOffset = ''
+      callback: () => {
+        console.log('ready')
+        ballOffset = ''
+        if (scoreIndex === 0 && score[scoreIndex] === 10) {
+          scoreIndex = 0;
+          score = [0, 0]
+        } else if (scoreIndex === 1) {
+          scoreIndex = 0;
+          score = [0, 0]
+        } else {
+          scoreIndex++;
+        }
+      }
     },
     {
       name: 'strafe',
@@ -104,12 +117,13 @@
     {
       name: 'rolling',
       ballAnim: 'rolling',
-      laneMoving: true
+      laneMoving: true,
     },
     {
       name: 'show-score',
       ballAnim: 'rolling upscreen',
       callback: () => {
+        state.scoreChanged = true
         setTimeout(() => {
           state.playVideo = true
         }, 2000);
@@ -119,13 +133,28 @@
   let stateIndex = 0
   state = states[stateIndex]
 
-  const nextState = () => {
-    console.log(stateIndex)
-    stateIndex = (stateIndex + 1) % states.length
-    state = states[stateIndex]
-    state.playVideo = false
-    if (state.callback)
-      state.callback()
+  const nextState = (type) => {
+    if (type === 'ready') {
+      stateIndex = 0;
+    }
+    if (type === 'strafe') {
+      stateIndex = 1;
+    }
+    if (type === 'angle') {
+      stateIndex = 2;
+    }
+    if (type === 'drive') {
+      stateIndex = 3;
+    }
+    if (type === 'pinCount') {
+      stateIndex = 4;
+    }
+    if (states[stateIndex] !== state) {
+      state = states[stateIndex]
+      state.playVideo = false
+      if (state.callback)
+        state.callback()
+    }
   }
   const prevState = () => {
     stateIndex = (stateIndex - 1)
@@ -139,14 +168,14 @@
 
   onMount(() => {
     const socket = new WebSocket("ws://143.215.107.222:8080")
+    // const socket = new WebSocket("ws://128.61.113.39:8080")
     socket.onmessage = (event) => {
       const {type} = JSON.parse(event.data)
-      if (type === 'strafe' || type === 'angle' || type === 'drive' || type === 'ready') {
-        nextState()
-      }
-      if (event.data.pinCount) {
-        score = 10 - pinCount
-        nextState()
+      nextState(type)
+      const {pinCount} = JSON.parse(event.data)
+      if (pinCount != null) {
+        score[scoreIndex] = 10 - pinCount
+        nextState('pinCount')
       }
     }
   })
