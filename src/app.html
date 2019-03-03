@@ -1,20 +1,21 @@
 <main>
   <HeaderText instructionText="{state.instructionText}" />
-  <Lane moving="{state.laneMoving}">
-  </Lane>
-  <div id="ball-container" class="{state.ballAnim}" style="--offset: {state.ballOffset}">
+  <Lane moving="{state.laneMoving}" />
+  <div id="ball-container" class="{state.ballAnim}" style="--offset: {ballOffset}">
     <Ball state="{state}" />
   </div>
   <div class="state-change-container">
     <button on:click="{prevState}">prev</button>
     <button on:click="{nextState}">next</button>
   </div>
+  <ScoreBoard score="{score}" playVideo="{state.playVideo}" frame="{frame}" nextStateCallback="{nextState}" />
 </main>
 
 <style>
   main {
     display: flex;
     justify-content: center;
+    --anim-delay: 1.810s;
   }
   #ball-container {
     --ball-size: 10rem;
@@ -24,11 +25,17 @@
     padding-left: var(--offset);
   }
   #ball-container.strafing {
-    animation: strafe 2s linear infinite;
+    animation: strafe 6.3s linear infinite;
+    animation-delay: var(--anim-delay);
+    padding-left: calc(50% - var(--ball-size) / 2);
   }
   #ball-container.resting {
     display: flex;
     justify-content: center;
+  }
+
+  #ball-container.rolling.upscreen {
+    animation: roll-upscreen 2s linear forwards;
   }
 
   /*To remove*/
@@ -52,20 +59,33 @@
       padding-left: calc(50% - var(--ball-size) / 2);
     }
   }
+
+  @keyframes roll-upscreen {
+    to {
+      bottom: 100%;
+    }
+  }
 </style>
 
 <script>
+  import {onMount} from 'svelte'
   import Lane from './components/Lane.html'
   import Ball from './components/Ball.html'
   import HeaderText from './components/Header.html'
+  import ScoreBoard from './components/ScoreBoard.html'
 
   let moving = true
   let state = {}
+  let ballOffset = ''
+  let score = 0
+  let frame = 1
   
   const states = [
     {
       name: 'reset',
       ballAnim: 'resting',
+      instructionText: 'Kick to start!',
+      callback: () => ballOffset = ''
     },
     {
       name: 'strafe',
@@ -78,7 +98,21 @@
       callback: () => {
         const style = window.getComputedStyle(document.getElementById('ball-container'), null)
         const padding = style.getPropertyValue('padding-left')
-        state.ballOffset = padding
+        ballOffset = padding
+      }
+    },
+    {
+      name: 'rolling',
+      ballAnim: 'rolling',
+      laneMoving: true
+    },
+    {
+      name: 'show-score',
+      ballAnim: 'rolling upscreen',
+      callback: () => {
+        setTimeout(() => {
+          state.playVideo = true
+        }, 2000);
       }
     }
   ]
@@ -86,8 +120,10 @@
   state = states[stateIndex]
 
   const nextState = () => {
+    console.log(stateIndex)
     stateIndex = (stateIndex + 1) % states.length
     state = states[stateIndex]
+    state.playVideo = false
     if (state.callback)
       state.callback()
   }
@@ -97,5 +133,22 @@
       stateIndex = states.length - 1
     state = states[stateIndex]
   }
+
+  let waitingOnPins = false
+  let readPins = false
+
+  onMount(() => {
+    const socket = new WebSocket("ws://143.215.107.222:8080")
+    socket.onmessage = (event) => {
+      const {type} = JSON.parse(event.data)
+      if (type === 'strafe' || type === 'angle' || type === 'drive' || type === 'ready') {
+        nextState()
+      }
+      if (event.data.pinCount) {
+        score = 10 - pinCount
+        nextState()
+      }
+    }
+  })
 
 </script>

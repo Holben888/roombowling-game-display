@@ -1,0 +1,51 @@
+<div class="score">
+  <div class="frame"></div>
+  <div class="frame"></div>
+  <div class="main"></div>
+</div>
+<video id="score-video" style="display: {playVideo ? 'initial' : 'none'}">
+  {#if playVideo}
+  <source src="/pin-videos/{score}.mp4" />
+  {/if}
+</video>
+
+<style>
+  .score {
+    position: fixed;
+    background: #efefef;
+    top: 2rem;
+    width: 5rem;
+    height: 5rem;
+    display: grid;
+    grid-template-rows: 1fr 2fr;
+    grid-template-columns: 1fr 1fr;
+  }
+  .score * {
+    border: 1px solid #333;
+  }
+  .score .main {
+    grid-column: span 2;
+  }
+  video {
+    position: fixed;
+    height: 100vh;
+    display: none;
+  }
+</style>
+
+<script>
+  import { afterUpdate } from 'svelte'
+
+  export let score = 0
+  export let frame = 1
+  export let playVideo = false
+  export let nextStateCallback = null
+
+  afterUpdate(() => {
+    if (playVideo) {
+      const scoreVideo = document.getElementById('score-video')
+      scoreVideo.addEventListener('ended', nextStateCallback, false)
+      scoreVideo.play()
+    }
+  })
+</script>
